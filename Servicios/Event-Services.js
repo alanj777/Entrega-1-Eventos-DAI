@@ -1,32 +1,21 @@
-export class eventService {
-    getAllEvents() {
-      console.log("getAllEvents");
-      return [
-        {
-          id: 1,
-          name: "evento1",
-          price: 10,
-        },
-      ];
-    }
+export class EventService{
+  getAllEvents(pageSize, requestedPage){
+      const query = `SELECT * FROM events limit ${pageSize} offset ${requestedPage}`;
+      const query2 = `SELECT COUNT(*) FROM events`;
+      const query3 = `SELECT event.name, event.description, event_categories.name, event_locations.name, event.start_date, event.duration_in_minutes, event.price, event.enabled_for_enrollment, event.max_assistance, users.username FROM evenets 
+      INNER JOIN event_categories 
+      ON id_event_category = event_categories.id
+      INNER JOIN event_locations
+      ON id_event_location = event_locations.id
+      INNER JOIN users
+      ON id_creator_user = users.id`
   }
-  
-  export class eventService1 {
-    getEventByFilter(pageSize, page, nombre, categoria, fechaI, tag) {
+  getEventsConFiltro(pageSize, page, name, category, startDate, tag){
+      const query = `SELECT * from events limit ${pageSize} offset ${page}`
+      const query2 = `SELECT events.name, event_categories.name, events.start_date, tags.name IF(events.name = ${name}, event_cateories.name = ${category} events.start_date = ${startDate}, tags.name = ${tag})`
+  }
+  DetallarEvent(name, description, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance){
+      const query = `SELECT * from events IF(name = ${name}, description = ${description}, start_date = ${start_date}, duration_in_minutes = ${duration_in_minutes}, price = ${price}, enabled_for_enrollment = ${enabled_for_enrollment}, max_assistance = ${max_assistance})`;
+  }
+}
 
-      return "funciona2";
-    }
-  }
-  
-  export class eventService2 {
-    getEventDetail(id) 
-    {
-
-    return "funciona3"
-    }
-  }
-  export class eventService3 {
-  getListadoParticipantes(){}
-  
-  
-  }
