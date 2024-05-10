@@ -104,6 +104,15 @@ if (attended=="true" || attended=="false" || attended != null)
   }
 }
 });
-  
+  import jwt from 'jsonwebtoken';
+const payload = {
+  id: 123,
+  username: 'Fiumba'
+};
+const secretKey = 'Fiumba123';
+const options = {
+  expiresIn: '1h',
+  issuer: 'organización'
+};
 
 export default router;
