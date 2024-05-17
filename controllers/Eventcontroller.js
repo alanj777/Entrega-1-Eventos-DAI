@@ -1,118 +1,154 @@
-import express, { request } from "express";
-import { eventService, eventService1,eventService2,eventService3 } from "../servicios/event-service.js";
+import express from "express";
+import eventService from "../servicios/event-service.js";
+import { AuthMiddleware } from "../auth/authMiddleware.js";
 
 const EventService = new eventService();
-const EventService1 = new eventService1();
-const EventService2 = new eventService2();
-const EventService3 = new eventService3();
-
-
 
 
 const router = express.Router();
 
 router.get("/", (request, response) => {
-  const limit = 20;
-  const offset = 1;
-  try {
-    const allEvents = EventService.getAllEvents(limit, offset);
-    return response.json(allEvents);
-  } catch (error) {
-    return response.json("Un Error");
-  }
-});
+  const limit = request.query.limit;  
+  const offset = request.query.offset; 
 
-//3
+  limit = parseInt(limit); 
+  offset = parseInt(offset); 
 
-router.get("/", (request, response) => {
-  const pageSize = request.query.pageSize; 
-  const page = request.query.page; 
-  const nombre = request.query.nombre;
-  const categoria = request.query.categoria;
-  const fechaI = request.query.fechaI;
-  const tag = request.query.tag;
-
-  if (!isNaN(Date.parse(fechaI))) { 
-  try {
-      const filter = EventService1.getEventByFilter(
-        1,
-        1,
-        "Buenos Aires",
-        "Baires Trap",
-        "2019/07/04",
-        "tag"
-      );
-      return response.json(filter);
+  if (!isNaN(limit) && !isNaN(offset)) {
+    try {
+      const allEvents = EventService.getAllEvents(limit, offset);
+      return response.json(allEvents);
     } catch (error) {
-      console.log("Error en el controller");
-      return response.json("Un Error");
+      console.error("Error en el controller", error);
+      return response.json("Error");
     }
   } else {
-    return response.json("La fecha no es datetime =(");
+    return response.json("Los parámetros limit y offset deben ser números.");
   }
 });
 
-//4
 router.get("/", (request, response) => {
   const pageSize = request.query.pageSize; 
-  const page = request.query.page; 
-  const nombre = request.query.id; 
+  const page = request.query.page;
+  const nombre = request.query.nombre; 
+  const categoria = request.query.categoria;
+  const fechaI = request.query.fechaI; 
+  const tag = request.query.tag;
 
-  try {
-      const filter = EventService1.getEventByFilter(
-        1,
-      );
+  pageSize = parseInt(pageSize);
+  page = parseInt(page);
+
+  if (!isNaN(pageSize) && !isNaN(page) && typeof nombre === "string" && typeof categoria === "string" && typeof tag === "string" && !isNaN(Date.parse(fechaI))) {
+    try {
+      const filter = EventService.getEventByFilter(pageSize, page, nombre, categoria, fechaI, tag);
       return response.json(filter);
     } catch (error) {
-      console.log("Un Error en el controller");
-      return response.json("Un Error");
+      console.error("Error en el controller", error);
+      return response.json("Error");
     }
+  } else {
+    return response.json("Los parámetros no cumplen con los tipos de datos esperados.");
   }
-);
-
+});
 
 
 router.get("/:id",(request,response) =>{
-const id = request.query.id;
-try {
-  const allEvents = EventService2.getEventDetail(1);
-  return response.json(allEvents);
-} catch (error) {
-  return response.json("Un Error");
-}
-});
+  const id = request.params.id;
+  id = parseInt(id);
 
+  if (!isNaN(id)) {
+    try {
+      const allEvents = EventService.getEventDetail(id);
+      return response.json(allEvents);
+    } catch (error) {
+      console.error("Error en el controller", error);
+      return response.json("Error");
+    }
+  } else {
+    return response.json("El ID (Parámetro) no cumple con el tipo de dato esperado.");
+  }
+});
 
 router.get("/:id/enrollment",(request,response) =>{
-  const pageSize = request.query.pageSize; 
-  const page = request.query.page; 
-  const id = request.query.id;
-  const username = request.query.username;
-  const first_name = request.query.first_name;
-  const last_name = request.query.last_name;
-  const attended = request.query.attended;
-  const rating = request.query.rating;
-  const description = request.query.description;
 
-if (attended=="true" || attended=="false" || attended != null) 
-{
-  try {
-    const allParticipantes = EventService3.getAllParticipantes(1,1,1,"Fiumba123","Alan","Jolo",true,30,"AAAAA");
-    return response.json(allParticipantes);
-  } catch (error) {
-    return response.json("Un Error");
+  const name = request.query.name; 
+  const username = request.query.username; 
+  const first_name = request.query.first_name; 
+  const last_name = request.query.last_name; 
+  const attended = request.query.attended;
+  const rating = request.query.rating; 
+
+
+
+  if (typeof name === "string" && typeof username === "string" && typeof first_name === "string" && typeof last_name === "string" && (attended === "true" || attended === "false" || attended === null) && !isNaN(rating)) {
+    try {
+      const allParticipantes = EventService.getAllParticipantes(name,username, first_name, last_name, attended, rating);
+      return response.json(allParticipantes);
+    } catch (error) {
+      console.error("Error en el controller", error);
+      return response.json("Error");
+    }
+  } else {
+    return response.json("Los parámetros no cumplen con los tipos de datos esperados.");
   }
+});
+
+
+router.post("/", (request, response) => {
+  try {
+  const nuevoEvento = request.body; 
+  const eventoCreado = EventService.createEvent(nuevoEvento);
+  return response.json(eventoCreado);
+  } catch (error) {
+  console.error("Error creando una nuevo evento:", error);
+  return response.json("Error");
+  }
+});
+
+router.put("/:id", (request, response) => {
+const id = request.params.id;
+if (!isNaN(id)) {
+try {
+  const eventoActualizado = request.body; 
+  const eventoModificada = EventService.updateEvent(id,eventoActualizado);
+  return response.json(eventoModificada);
+} catch (error) {
+  console.error("Error actualizando el evento:", error);
+  return response.json("Error");
+}
+} else {
+    return response.json("El parámetro ID no cumple con el tipo de dato esperado.");
 }
 });
-  import jwt from 'jsonwebtoken';
-const payload = {
-  id: 123,
-  username: 'Fiumba'
-};
-const secretKey = 'Fiumba123';
-const options = {
-  expiresIn: '1h',
-  issuer: 'organización'
-};
+
+router.post("/:id/enrollment", (request, response) => {
+
+const idEvento = request.query.idEvento; 
+const attended = request.query.attended; 
+const rating = request.query.rating; 
+const descripcion = request.query.descripcion; 
+const observations = request.query.observations;
+try {
+  const inscripcion = EventService.InscripcionEvento(idEvento,attended,rating,descripcion,observations);
+  return res.json(inscripcion);
+} catch (error) {
+  console.log(error);
+  return res.json(error);
+}
+});
+
+router.patch("/:id/enrollment", (request, response) => {
+const idEvento = request.params.idEvento;
+const rating = request.query.rating;
+try {
+  const cambiar = EventService.CambiarRating(idEvento, rating);
+  return res.json(cambiar);
+} catch (error) {
+  console.log(error);
+  return res.json(error);
+}
+});
+
+
 
 export default router;
