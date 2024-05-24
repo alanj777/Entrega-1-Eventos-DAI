@@ -18,4 +18,3 @@ export class EventService{
       const query = `SELECT * from events IF(name = ${name}, description = ${description}, start_date = ${start_date}, duration_in_minutes = ${duration_in_minutes}, price = ${price}, enabled_for_enrollment = ${enabled_for_enrollment}, max_assistance = ${max_assistance})`;
   }
 }
-
