@@ -1,6 +1,4 @@
-//import { query } from "express";
-//hacer repositorio
-//UserRepository()
+
 
 import { query } from "express";
 import userRepository from "../repositories/category-repositories.js"
