@@ -1,5 +1,5 @@
 import express from "express";
-import eventService from "../servicios/event-service.js";
+import eventService from "..src/servicios/event-service.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";
 
 const EventService = new eventService();
