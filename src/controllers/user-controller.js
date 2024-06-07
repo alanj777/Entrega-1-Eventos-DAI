@@ -1,5 +1,5 @@
 import express from "express";
-import userService from "../servicios/user-service.js";
+import userService from "../Servicios/user-service.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";
 
 const UserService = new userService();
