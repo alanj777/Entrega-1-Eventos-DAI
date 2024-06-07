@@ -1,5 +1,5 @@
 import express from "express";
-import provinciaService from "../servicios/provinicias-service.js";
+import provinciaService from "../Servicios/provinicias-service.js";
 
 const router = express.Router();
 
