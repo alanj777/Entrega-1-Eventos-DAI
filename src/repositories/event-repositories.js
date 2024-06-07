@@ -14,14 +14,19 @@ export default class eventRepository
     }
 
 
-    async getAllEvents(limit, offset) {
-        const sql = "SELECT * FROM events limit = $1 offset = $2";
-        const values = [limit, offset];
-        return await this.DBClient.query(sql, values);
+    async cantidadEventosPag() { //revisar
+      var returnEntity = 0;
+      try {
+        var sql = "SELECT COUNT(*) FROM events"
+        const result = await this.BDclient.query(sql)
+        console.log(result.rows);
+        return result.rows[0].count
+      } catch (error) {
+        return error;
+      }
     }
 
-
-    async getEventByFilter(pageSize, page, nombre, categoria, fechaI, tag) {
+    async getEventByFilter(Evento, pageSize, page) {
         var returnEntity = null;
     
         try {
@@ -135,7 +140,7 @@ export default class eventRepository
       }  
 
     
-      async updateEvent(evento) { ////////////////
+      async updateEvent(evento) {
         var returnEntity = null;
         try {
           const sql = `Insert into events(name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max__assistance) values ("1","$9","$2","$3","$4","$5,"$6","$7","$8")`;
@@ -167,7 +172,7 @@ export default class eventRepository
         return returnEntity;
       } 
 
-      async InscripcionEvento(evento, users) {
+      async InscripcionEvento(evento, users) { 
         var returnEntity = null
         try {
           var sql = ""
@@ -189,3 +194,10 @@ export default class eventRepository
     
 
 }
+
+
+
+
+    
+      
+    
