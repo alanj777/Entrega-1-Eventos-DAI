@@ -135,7 +135,7 @@ export default class eventRepository
       }  
 
     
-      async updateEvent(evento) { 
+      async updateEvent(evento) { ////////////////
         var returnEntity = null;
         try {
           const sql = `Insert into events(name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max__assistance) values ("1","$9","$2","$3","$4","$5,"$6","$7","$8")`;

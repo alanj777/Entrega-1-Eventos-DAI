@@ -7,16 +7,17 @@ const EventService = new eventService();
 
   const router = express.Router();
 
-  router.get("/", (request, response) => {
-    const limit = request.query.limit;
+  router.get("/", async (request, response) => {
+    const limit = request.query.limit; 
     const offset = request.query.offset; 
+
 
     limit = parseInt(limit); 
     offset = parseInt(offset); 
 
     if (!isNaN(limit) && !isNaN(offset)) {
       try {
-        const allEvents = EventService.getAllEvents(limit, offset);
+        const allEvents = await EventService.getAllEvents(limit, offset);
         return response.json(allEvents);
       } catch (error) {
         console.error("Error en el controller", error);
@@ -27,7 +28,7 @@ const EventService = new eventService();
     }
   });
 
-  router.get("/", (request, response) => {
+  router.get("/", async (request, response) => {
     let pageSize = request.query.pageSize; 
     let page = request.query.page;
     const nombre = request.query.nombre; 
@@ -40,7 +41,7 @@ const EventService = new eventService();
 
     if (!isNaN(pageSize) && !isNaN(page) && typeof nombre === "string" && typeof categoria === "string" && typeof tag === "string" && !isNaN(Date.parse(fechaI))) {
       try {
-        const filter = EventService.getEventByFilter(pageSize, page, nombre, categoria, fechaI, tag);
+        const filter = await EventService.getEventByFilter(pageSize, page, nombre, categoria, fechaI, tag);
         return response.json(filter);
       } catch (error) {
         console.error("Error en el controller", error);
@@ -70,7 +71,7 @@ const EventService = new eventService();
     }
   });
 
-  router.get("/:id/enrollment",(request,response) =>{
+  router.get("/:id/enrollment", async(request,response) =>{
 
     const name = request.query.name; 
     const username = request.query.username; 
@@ -80,7 +81,7 @@ const EventService = new eventService();
     const rating = request.query.rating; 
     if (typeof name === "string" && typeof username === "string" && typeof first_name === "string" && typeof last_name === "string" && (attended === "true" || attended === "false" || attended === null) && !isNaN(rating)) {
       try {
-        const allParticipantes = EventService.getAllParticipantes(name,username, first_name, last_name, attended, rating);
+        const allParticipantes = await EventService.getAllParticipantes(name,username, first_name, last_name, attended, rating);
         return response.json(allParticipantes);
       } catch (error) {
         console.error("Error en el controller", error);
@@ -92,10 +93,10 @@ const EventService = new eventService();
   });
 
   
-  router.post("/", (request, response) => {
+  router.post("/", async(request, response) => {
     try {
     const nuevoEvento = request.body; 
-    const eventoCreado = EventService.createEvent(nuevoEvento);
+    const eventoCreado = await EventService.createEvent(nuevoEvento);
     return response.json(eventoCreado);
     } catch (error) {
     console.error("Error al crear una nuevo evento:", error);
@@ -103,12 +104,12 @@ const EventService = new eventService();
     }
 });
 
-router.put("/:id", (request, response) => {
+router.put("/:id",async (request, response) => {
   const id = request.params.id;
   if (!isNaN(id)) {
   try {
     const eventoActualizado = request.body; 
-    const eventoModificada = EventService.updateEvent(id,eventoActualizado);
+    const eventoModificada =await EventService.updateEvent(id,eventoActualizado);
     return response.json(eventoModificada);
   } catch (error) {
     console.error("Error al actualizar el evento:", error);
@@ -119,7 +120,7 @@ router.put("/:id", (request, response) => {
   }
 });
 
-router.post("/:id/enrollment", (request, response) => {
+router.post("/:id/enrollment",async(request, response) => {
 
   const idEvento = request.query.idEvento; 
   const attended = request.query.attended; 
@@ -127,7 +128,7 @@ router.post("/:id/enrollment", (request, response) => {
   const descripcion = request.query.descripcion; 
   const observations = request.query.observations;
   try {
-    const inscripcion = EventService.InscripcionEvento(idEvento,attended,rating,descripcion,observations);
+    const inscripcion = await EventService.InscripcionEvento(idEvento,attended,rating,descripcion,observations);
     return res.json(inscripcion);
   } catch (error) {
     console.log(error);
@@ -135,11 +136,11 @@ router.post("/:id/enrollment", (request, response) => {
   }
 });
 
-router.patch("/:id/enrollment", (request, response) => {
+router.patch("/:id/enrollment", async(request, response) => {
   const idEvento = request.params.idEvento;
   const rating = request.query.rating;
   try {
-    const cambiar = EventService.CambiarRating(idEvento, rating);
+    const cambiar = await EventService.CambiarRating(idEvento, rating);
     return res.json(cambiar);
   } catch (error) {
     console.log(error);
