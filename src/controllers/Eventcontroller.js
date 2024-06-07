@@ -10,8 +10,6 @@ const EventService = new eventService();
   router.get("/", async (request, response) => {
     const limit = request.query.limit; 
     const offset = request.query.offset; 
-
-
     limit = parseInt(limit); 
     offset = parseInt(offset); 
 
