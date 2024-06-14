@@ -1,5 +1,5 @@
 import express from "express";
-import eventService from "../servicios/event-service.js";
+import eventService from "../Servicios/event-service.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";
 import Evento from "../entities/Evento.js";
 
@@ -20,8 +20,8 @@ const router = express.Router();
         const filter = await EventService.getEventByFilter(Evento, pageSize, page);
         return response.json(filter);
       } catch (error) {
-        console.error("Un Error en el controller", error);
-        return response.json("Un Error");
+        console.error("Error en el controller", error);
+        return response.json("Error");
       }
     } else {
       return response.json("Los parámetros no cumplen con los tipos de datos esperados.");
@@ -38,8 +38,8 @@ const router = express.Router();
 
         return response.json(allEvents);
       } catch (error) {
-        console.error("Un Error en el controller", error);
-        return response.json("Un Error");
+        console.error("Error en el controller", error);
+        return response.json("Error");
       }
     } else {
       return response.json("El parámetro ID no cumple con el tipo de dato esperado.");
@@ -59,8 +59,8 @@ const router = express.Router();
         const allParticipantes = await EventService.getAllParticipantes(name,username, first_name, last_name, attended, rating);
         return response.json(allParticipantes);
       } catch (error) {
-        console.error("Un Error en el controller", error);
-        return response.json("Un Error");
+        console.error("Error en el controller", error);
+        return response.json("Error");
       }
     } else {
       return response.json("Los parámetros no cumplen con los tipos de datos esperados.");
@@ -75,7 +75,7 @@ const router = express.Router();
     return response.json(eventoCreado);
     } catch (error) {
     console.error("Error al crear una nuevo evento:", error);
-    return response.json("Un Error");
+    return response.json("Error");
     }
 });
 
@@ -88,7 +88,7 @@ router.put("/:id",async (request, response) => {
     return response.json(eventoModificada);
   } catch (error) {
     console.error("Error al actualizar el evento:", error);
-    return response.json("Un Error");
+    return response.json("Error");
   }
   } else {
       return response.json("El parámetro ID no cumple con el tipo de dato esperado.");
