@@ -10,6 +10,3 @@ try {
 }
     return payloadOriginal
 }
-
-
-

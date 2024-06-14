@@ -1,5 +1,5 @@
 import express from "express";
-import locationService from "../Servicios/location-service.js";
+import locationService from "../servicios/location-service.js";
 const router = express.Router();
 const LocationService = new locationService();
 
@@ -8,7 +8,7 @@ const LocationService = new locationService();
         const reqPage = req.query.reqPage;
         try {
           const Localidades = await LocationService.getLocalidades(pageSize, reqPage);
-          return res.status(200).json(Localidades); //200
+          return res.status(200).json(Localidades);
         } catch (error) {
           return res.json(error);
         }
