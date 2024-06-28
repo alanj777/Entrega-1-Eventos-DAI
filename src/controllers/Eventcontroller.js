@@ -1,99 +1,213 @@
 import express from "express";
-import eventService from "../Servicios/event-service.js";
-import { AuthMiddleware } from "../auth/authMiddleware.js";
+import eventService from "../servicios/event-service.js";
+import locationService from "../servicios/location-service.js";
+
+import authMiddleware from "../auth/authMiddleware.js";
 import Evento from "../entities/Evento.js";
+import EventLocation from "../entities/EventLoc.js";
+
 
 const EventService = new eventService();
+const LocationService = new locationService();
+
 const router = express.Router();
 
-  router.get("/", async (request, response) => {
+router.get("/", async (request, response) => {
     const Evento = {};
-    const pageSize = request.query.pageSize; 
-    const page = request.query.page;
-    Evento.name = request.query.nombre; 
-    Evento.category = request.query.categoria;
-    Evento.startDate = request.query.fechaI; 
-    Evento.tag  = request.query.tag;
+    const limit = request.query.limit || 10;
+    const offset = request.query.offset||0;
+    Evento.name = request.query.name;
+    Evento.category = request.query.category;
+    Evento.startDate = request.query.startDate;
+    Evento.tag = request.query.tag;
 
-    if (!isNaN(pageSize) && !isNaN(page) && typeof nombre === "string" && typeof categoria === "string" && typeof tag === "string" && !isNaN(Date.parse(fechaI))) {
-      try {
-        const filter = await EventService.getEventByFilter(Evento, pageSize, page);
+    try {
+        const filter = await EventService.getEventByFilter(Evento, limit, offset);
+        console.log("entre")
         return response.json(filter);
-      } catch (error) {
-        console.error("Error en el controller", error);
-        return response.json("Error");
-      }
-    } else {
-      return response.json("Los parámetros no cumplen con los tipos de datos esperados.");
+    } catch (error) {
+        console.error("Un Error en el controller", error);
+        return response.status(500).json({ error: "Un Error" });
     }
-  });
+});
+  
 
-
-  router.get("/:id",async (request,response) =>{
+  router.get("/:id",async (request,response) =>{ 
     let id = request.params.id;
 
     if (!isNaN(id)) {
       try {
-        let allEvents = await EventService.getEventDetail(id);
-
-        return response.json(allEvents);
+        const allEvents = await EventService.getEventDetail(id);
+        if (allEvents) {
+          return res.status(200).json(allEvents);
+        }
+        else
+        {
+          return res.status(404).send(); //No existe, ya me fijo
+        }
       } catch (error) {
-        console.error("Error en el controller", error);
-        return response.json("Error");
+        console.error("Un Error en el controller", error);
+        return response.json("Un Error");
       }
     } else {
       return response.json("El parámetro ID no cumple con el tipo de dato esperado.");
     }
   });
 
+
+
   router.get("/:id/enrollment", async(request,response) =>{
 
+    const id = request.params.id; 
     const name = request.query.name; 
     const username = request.query.username; 
     const first_name = request.query.first_name; 
     const last_name = request.query.last_name; 
     const attended = request.query.attended;
     const rating = request.query.rating; 
-    if (typeof name === "string" && typeof username === "string" && typeof first_name === "string" && typeof last_name === "string" && (attended === "true" || attended === "false" || attended === null) && !isNaN(rating)) {
       try {
-        const allParticipantes = await EventService.getAllParticipantes(name,username, first_name, last_name, attended, rating);
-        return response.json(allParticipantes);
+        const allParticipantes = await EventService.getAllParticipantes(id,name,username, first_name, last_name, attended, rating);
+        console.log(allParticipantes)
+        return res.status(200).json(allParticipantes);
       } catch (error) {
-        console.error("Error en el controller", error);
-        return response.json("Error");
-      }
-    } else {
-      return response.json("Los parámetros no cumplen con los tipos de datos esperados.");
-    }
+        console.error("Un Error en el controller", error);
+        return response.json("Un Error");
+      
+    } 
   });
 
   
-  router.post("/", async(request, response) => {
+  router.post("/",authMiddleware,async(request, response) => {
+    const Evento = {};
+    Evento.name = request.body.name;
+    Evento.description = request.body.description;
+    Evento.id_event_category = request.body.id_event_category
+    Evento.id_event_location = request.body.id_event_location
+    Evento.start_date = request.body.start_date;
+    Evento.duration_in_minutes = request.body.duration_in_minutes;
+    Evento.price = request.body.price;
+    Evento.enabled_for_enrollment = request.body.enabled_for_enrollment;
+    Evento.max_assistance = request.body.max_assistance;
+    Evento.id_creator_user = request.user.id; 
+
     try {
-    const nuevoEvento = request.body; 
-    const eventoCreado = await EventService.createEvent(nuevoEvento);
-    return response.json(eventoCreado);
+
+      var eventolocacion = await LocationService.getEventLocationById(Evento.id_event_location) 
+
+      if (Evento.name && Evento.description && Evento.id_event_category && Evento.id_event_location && Evento.start_date && Evento.duration_in_minutes && Evento.price && Evento.enabled_for_enrollment && Evento.max_assistance && Evento.id_creator_user) 
+      {
+        if (eventolocacion.max_capacity > Evento.max_assistance)
+        {
+           if(Evento.name.length >3 && Evento.description.length >3) 
+          {
+            if  (Evento.price > 0 && Evento.duration_in_minutes > 0) 
+            {
+              const eventoCreado = await EventService.createEvent(Evento);
+              return response.status(201).json(eventoCreado);
+            } 
+            else
+            {
+              return response.status(400).send("el precio y/o la duracion es menor a 0 ")
+            }
+          }
+          else
+          {
+            return response.status(400).send("el nombre y/o descripcion tiene menos de 3 caracteres ")
+          }
+        }
+        else
+        {
+          return response.status(400).send("La asistencia es mayor a la capacidad")
+        }
+      }
+      else
+      {
+        return response.status(400).send("Error en el tipo de dato o faltan")
+      }
     } catch (error) {
     console.error("Error al crear una nuevo evento:", error);
-    return response.json("Error");
+    return response.json("Un Error");
     }
 });
 
-router.put("/:id",async (request, response) => {
-  const id = request.params.id;
-  if (!isNaN(id)) {
+router.put("/",authMiddleware,async(request, response) => {
+  const Evento = {};
+  Evento.name = request.body.name;
+  Evento.description = request.body.description;
+  Evento.id_event_category = request.body.id_event_category
+  Evento.id_event_location = request.body.id_event_location
+  Evento.start_date = request.body.start_date;
+  Evento.duration_in_minutes = request.body.duration_in_minutes;
+  Evento.price = request.body.price;
+  Evento.enabled_for_enrollment = request.body.enabled_for_enrollment;
+  Evento.max_assistance = request.body.max_assistance;
+  Evento.id = request.body.id; 
   try {
-    const eventoActualizado = request.body; 
-    const eventoModificada =await EventService.updateEvent(id,eventoActualizado);
-    return response.json(eventoModificada);
-  } catch (error) {
-    console.error("Error al actualizar el evento:", error);
-    return response.json("Error");
+
+    var eventolocacion = await LocationService.getEventLocationById(Evento.id_event_location) 
+    var idevento = await EventService.getEventId(Evento.id) 
+  if (idevento.id!=null) {
+    if (Evento.name && Evento.description && Evento.id_event_category && Evento.id_event_location && Evento.start_date && Evento.duration_in_minutes && Evento.price && Evento.enabled_for_enrollment && Evento.max_assistance ) 
+    {
+      if (eventolocacion.max_capacity > Evento.max_assistance)
+      {
+         if(Evento.name.length >3 && Evento.description.length >3) 
+        {
+          if  (Evento.price > 0 && Evento.duration_in_minutes > 0) 
+          {
+            const eventoCreado = await EventService.updateEvent(Evento);
+            return response.status(201).json(eventoCreado);
+          } 
+          else
+          {
+            return response.status(400).send("el precio y/o la duracion es menor a 0 ")
+          }
+        }
+        else
+        {
+          return response.status(400).send("el nombre y/o descripcion tiene menos de 3 caracteres ")
+        }
+      }
+      else
+      {
+        return response.status(400).send("La asistencia es mayor a la capacidad")
+      }
+    }
+    else
+    {
+      return response.status(400).send("Error en el tipo de dato o faltan")
+    }
   }
-  } else {
-      return response.json("El parámetro ID no cumple con el tipo de dato esperado.");
+  else
+  {
+    return response.status(400).send("No existe el id del evento")
+  }
+  } catch (error) {
+  console.error("Error al crear una nuevo evento:", error);
+  return response.json("Un Error");
   }
 });
+
+router.delete("/:id",authMiddleware,async(request, response) => {
+const idEvento =  request.params.id; 
+var ideve = await EventService.getEventId(idEvento) 
+try 
+{
+if (ideve.id) {
+    const eliminar = await EventService.deleteEvent(idEvento);
+    return response.status(200).json(eliminar);
+  } 
+  else
+  {
+  return response.status(400).json("No existe la id");
+  }
+}
+  catch (error) {
+    console.log(error);
+    return res.json(error);
+  }
+});
+
 
 router.post("/:id/enrollment",async(request, response) => {
 
@@ -112,8 +226,7 @@ router.post("/:id/enrollment",async(request, response) => {
 });
 
 router.patch("/:id/enrollment", async(request, response) => {
-  const idEvento = request.params.idEvento;
-  const rating = request.query.rating;
+const id = request.body.params
   try {
     const cambiar = await EventService.CambiarRating(idEvento, rating);
     return res.json(cambiar);

@@ -2,13 +2,11 @@ import jwt from "jsonwebtoken"
 import "dotenv/config"
 
 export default async function (Usuario){
-    const options={
+    const options={ //opciones token
     expiresIn:"3h",
-    issuer:"Jolodovsky"
+    issuer:"jolo"
 }   
     const payload = {"id":Usuario.id}
-    console.log(typeof payload);
-    const token=jwt.sign(payload,process.env.SECRET_KEY,options);
-    return token; 
-
+    const token=jwt.sign(payload,process.env.SECRET_KEY,options); 
+    return token; //obtengo Token
 }
