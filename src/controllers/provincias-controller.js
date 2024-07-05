@@ -105,7 +105,7 @@ router.put("/",async (request, response) =>{
     if (Provincia.latitude) {
       if(!isNaN(Provincia.latitude)){
       }else{
-        return response.status(400).send("Latitude no es un numero");
+        return response.status(400).send("Latitud no es un numero");
       } 
     }
     if (Provincia.longitude ) {
