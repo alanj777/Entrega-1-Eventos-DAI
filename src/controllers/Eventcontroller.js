@@ -1,6 +1,6 @@
 import express from "express";
-import eventService from "../servicios/event-service.js";
-import locationService from "../servicios/location-service.js";
+import eventService from "../Servicios/event-service.js";
+import locationService from "../Servicios/location-service.js";
 
 import authMiddleware from "../auth/authMiddleware.js";
 
