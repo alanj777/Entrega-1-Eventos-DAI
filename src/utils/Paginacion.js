@@ -1,15 +1,16 @@
+//(Aclarar todo en casa porque soy capaz de olvidarme algo ajsjsjsjss)
 import "dotenv/config";
 
 const BASE_URL = process.env.BASE_URL;
 
-export class PaginationDto {
-  limit;
-  offset;
-  nextPage;
-  total;
+export class PaginationDto { //clasepag
+  limit;//limite de elementos por pag
+  offset;//indice de la pag actual
+  nextPage;//proxima pag
+  total; //el total de los elementos disponibles
 }
 
-export class Pagination {
+export class Pagination { //Comienza paginación
   limitRegex = /limit=\d+/;
   offsetRegex = /offset=\d+/;
 
@@ -36,7 +37,7 @@ export class Pagination {
     return response;
   }
 
-  buildNextPage(path, limit, currentOffset) {
+  buildNextPage(path, limit, currentOffset) { //Proceda
     let url = BASE_URL + path;
     if (this.limitRegex.test(url)) {
       url = url.replace(this.limitRegex, `limit=${limit}`);

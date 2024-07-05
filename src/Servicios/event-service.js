@@ -1,51 +1,112 @@
 import { query } from "express";
 import eventRepository from "../repositories/event-repositories.js"
+import { Pagination} from "../utils/Paginacion.js";
+const PaginacionConfig = new Pagination();
+
 const EventRepository= new eventRepository();
 
 export default class eventService {
  
 
-  async getEventByFilter(Evento, pageSize, page) 
-    {
-    const getEventByFilter = await EventRepository.getEventByFilter(Evento, pageSize, page);
-    return getEventByFilter;
+    async getEventByFilter(Evento, limit, offset) {
+      const parsedLimit = PaginacionConfig.parseLimit(limit) 
+      const parsedOffset = PaginacionConfig.parseOffset(offset)
+      const cantidad =  Number.parseInt(await EventRepository.cantidadEventosPag());
+      const nextPage=((parsedOffset+1) * parsedLimit<=cantidad) ?`/event?${(Evento.name) ?`&name=${Evento.name}`:''}${(Evento.category) ?`&category=${Evento.category}` : ''}${(Evento.startDate) ?`&startDate=${Evento.startDate}`:''}${(Evento.tag) ?`&tag=${Evento.tag}`:''}`:"null"
+      const paginacion = PaginacionConfig.buildPaginationDto(parsedLimit, parsedOffset, cantidad, nextPage)
+      const eventosPorFiltro = await EventRepository.getEventByFilter(Evento, parsedLimit, parsedOffset)
+      if (eventosPorFiltro!=null) {
+        const collection = {eventosPorFiltro, paginacion}
+        return collection;
+      }else{
+        return {eventosPorFiltro}
+      }  
     }
   
-
   async getEventDetail(id) 
   {
     const getEventDetail = await EventRepository.getEventDetail(id);
     return getEventDetail;
   }
 
-
-  async getAllParticipantes(pageSize,page,id,username,first_name,last_name,attended,rating,description)
+  async getEventId(id) 
   {
-    const getAllParticipantes = await EventRepository.getAllParticipantes(id, mensajeCondicion);
+    const getEventId = await EventRepository.getEventId(id);
+    return getEventId;
+  }
+
+
+  async getAllParticipantes(Evento_Enrrolment)
+  {
+    const getAllParticipantes = await EventRepository.getAllParticipantes(Evento_Enrrolment);
+    console.log(getAllParticipantes)
     return getAllParticipantes;
   }
 
-  async createEvent(nuevoEvento)
+  async createEvent(evento)
   {
-    await EventRepository.createEvent(nuevoEvento);
+    await EventRepository.createEvent(evento);
     return "Insertado";
   }
   
-  async updateEvent(id, eventoActualizado)
+  async updateEvent(evento)
   {
-    await EventRepository.updateEvent(id, eventoActualizado);
+    await EventRepository.updateEvent(evento);
     return "Actualizado";
   }
   
-  async CambiarRating(idEvento, rating) {
-    await EventRepository.UpdateRating(idEvento, rating)
-    return "rating actualizado";
-  }
-  
-  async InsertEvento(evento) {
+    
+  async deleteEvent(idEvento) {
 
-    await EventRepository.InscripcionEvento(evento);
-    return "insertado con exito";
+    await EventRepository.deleteEvent(idEvento);
+    return "Eliminado";
   }
 
+
+
+    async getTagsByEvent(idEvento){
+      return EventRepository.getTagsByEvent(idEvento);
+    }
+    
+    async getEnrolmentsById(idEvento){
+      return EventRepository.getEnrolmentsById(idEvento);
+    }
+
+    async getInscriptosAlEvento(idEvento)
+    {
+      return EventRepository.getInscriptosAlEvento(idEvento)
+    }
+
+    async isUserRegistered(idEvento,idUser)
+    {
+      return EventRepository.isUserRegistered(idEvento,idUser)
+    }
+
+    async InscripcionEvento(event_enrollment)
+    {
+      await EventRepository.InscripcionEvento(event_enrollment)
+      return "inscripto";
+
+    }
+
+    async CambiarRating(idEvento, rating) {
+      await EventRepository.UpdateRating(idEvento, rating)
+      return "rating actualizado";
+    }
+
+
+    async eliminarInscripcion(id,id_user) {
+      return EventRepository.eliminarInscripcion(id,id_user)
+    }
+
+
+    async patchEvento(id,id_user,observations,rating) {
+      return EventRepository.patchEvento(id,id_user,observations,rating)
+    }
+
+    async getEventByEventLocation(id) {
+      return EventRepository.getEventByEventLocation(id)
+    }
+
+    
   }

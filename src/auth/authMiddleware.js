@@ -4,11 +4,10 @@ export default async function (req,res,next){
     if(!req.headers.authorization){
         res.status(401).send("No tenes acceso a la informaccion");
     }else{
-        const token =req.headers.authorization.split(' ')[1]; 
-        const payload=await DecryptToken(token); 
+        const token =req.headers.authorization.split(' ')[1]; //Kick innecesidades
+        const payload=await DecryptToken(token); //manda tk a jwt, devuelve el payload
         if(payload!=null){
-            console.log(payload)
-            req.user=payload; 
+            req.user=payload; //Pide el id del user por request
             next();
         }else{
             res.status(401).send("error en el token") ;
@@ -16,4 +15,4 @@ export default async function (req,res,next){
     }
 }
 
-
+//Verify token, si hay = + id token
