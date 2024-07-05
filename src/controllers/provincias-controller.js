@@ -1,6 +1,6 @@
 import express from "express";
-import provinciaService from "../servicios/provinicias-service.js";
-import locationService from "../servicios/location-service.js";
+import provinciaService from "../Servicios/provinicias-service.js";
+import locationService from "../Servicios/location-service.js";
 
 const router = express.Router();
 
@@ -10,8 +10,8 @@ const LocationService = new locationService();
 
 
 router.get("/", async (request, response) => {
-  const limit = request.query.limit || 10; // Valor por defecto - registros por pagina
-  const offset = request.query.offset||0;  //empieza desde 0 - del 0-10. punto de inicio
+  const limit = request.query.limit || 10; // valor Default - registros por pagina
+  const offset = request.query.offset||0;  // 0-10. start point
   try {
       const provincias = await ProvinciaService.getAllProvincias(limit, offset);
       return response.json(provincias);
