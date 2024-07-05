@@ -1,5 +1,5 @@
 import express, { request, response } from "express"; 
-import LocalidadService  from "../servicios/location-service.js"; 
+import LocalidadService  from "../Servicios/location-service.js"; 
 import AuthMiddleware from "../auth/authMiddleware.js"; 
 
 const localidadService = new LocalidadService(); 
