@@ -19,13 +19,10 @@ async getLocalidades(limit, offset) {
     const cantidad =  Number.parseInt(await LocationRepository.countLocalidades()); //cant Eventos (Hay que estar seguro)
     const nextPage=((parsedOffset+1) * parsedLimit<=cantidad) ?`/location ?`:"null"
     const paginacion = PaginacionConfig.buildPaginationDto(parsedLimit, parsedOffset, cantidad, nextPage)
-    const localidades = await LocationRepository.getLocalidades(parsedLimit, parsedOffset)
-    if (localidades!=null) {
-      const collection = {localidades, paginacion}
-      return collection;
-    }else{
-      return {localidades}
-    }  
+    const collection = await LocationRepository.getLocalidades(parsedLimit, parsedOffset)
+    const collection2 = {collection, paginacion}
+    return collection2;
+
   }
 
     async getLocalidadById(id) {
@@ -38,12 +35,9 @@ async getLocalidades(limit, offset) {
         const cantidad =  Number.parseInt(await LocationRepository.countLocalidades()); //cant Eventos
         const nextPage=((parsedOffset+1) * parsedLimit<=cantidad) ?`/location/${id_location}/event-location`:"null";
         const paginacion = PaginacionConfig.buildPaginationDto(parsedLimit, parsedOffset, cantidad, nextPage)
-        const localidadesEvent = await LocationRepository.getEventLocationsByLocation(id_location,parsedLimit, parsedOffset)
-        if (localidadesEvent!=null) {
-          const collection = {localidadesEvent, paginacion}
-          return collection;
-        }else{
-          return {localidadesEvent}
-        }  
+        const collection = await LocationRepository.getEventLocationsByLocation(id_location,parsedLimit, parsedOffset)
+        const collection2 = {collection, paginacion}
+        return collection2;
       }
 }
+      

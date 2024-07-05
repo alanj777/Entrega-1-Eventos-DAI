@@ -109,7 +109,7 @@ router.put("/",async (request, response) =>{
       } 
     }
     if (Provincia.longitude ) {
-      if(!isNaN(Provincia.longitude)){
+      if(!isNaN(Provincia.longitude)){ 
       }else{
         return response.status(400).send("Longitud no es un numero");
       } 
@@ -118,14 +118,14 @@ router.put("/",async (request, response) =>{
       {
         if(Provincia.name.length>3)
           {
-            return response.status(400).send("La provinicia tiene menos de letras");
+            return response.status(400).send("La provinicia tiene menos de 3 letras");
     
           }
       }
       
       const provincia = await ProvinciaService.updateProvincia(Provincia);
       if (provincia) {
-      return response.status(201).send("actualiazo")
+      return response.status(201).send("Actualizo")
       }
        else
        {

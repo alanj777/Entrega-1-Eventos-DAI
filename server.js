@@ -11,16 +11,14 @@ const app = express(); // Init API REST
 app.use(express.json()); // Middleware to parse JSON
 const port = 3100;
 
-app.use("/event", EventController );
-app.use("/user", UserController );
-app.use("/provincias", ProvinciasController );  
-app.use("/location", LocationController );  
-app.use("/event-location", EventLocationController);  
-app.use("/event-category", CategoryController );  
+app.use("/api/event", EventController );
+app.use("/api/user", UserController );
+app.use("/api/province", ProvinciasController );  
+app.use("/api/location", LocationController );  
+app.use("/api/event-location", EventLocationController);  
+app.use("/api/event-category", CategoryController );  
 
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
-
-  
